@@ -1,0 +1,46 @@
+# docker-compose.yml
+
+version: "3"
+services:
+
+# A api do BD relacional será aqui
+  shopee-api-principal: # Servico do BD no docker
+    image: postgres:9.6
+    container_name: shopee-api-bd-postgres # Nome do container
+    restart: always
+    environment:
+      POSTGRES_USER: ${USER_BD_PRINCIPAL} # Usuário do BD
+      POSTGRES_PASSWORD: ${PASS_BD_PRINCIPAL} # Senha do BD
+      POSTGRES_DB: ${NAME_BD_PRINCIPAL} # Nome do BD
+    ports:
+      - ${PORT_BD_PRINCIPAL}:${PORT_POSTGRES} # Porta do BD : porta padrão
+    volumes:
+      - ./shopee-bd-principal:/var/lib/postgresql/data
+
+# A api do BD não relacional sera aqui
+  shopee-api-secundaria: # Servico do BD no docker
+    image: mongo:latest
+    container_name: shopee-api-bd-mongo # Nome do container
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${USER_BD_SECUNDARIA} # Usuário do BD
+      MONGO_INITDB_ROOT_PASSWORD: ${PASS_BD_SECUNDARIA} # Senha do BD
+      MONGO_INITDB_DATABASE: ${NAME_BD_SECUNDARIA} # Nome do BD
+    ports:
+      - ${PORT_BD_SECUNDARIA}:${PORT_MONGO} # Porta do BD : porta padrão
+    volumes:
+      - ./shopee-bd-secundario:/data/db
+
+# A blobstore do sistema será aqui
+  shopee-api-blobstore: # Servico do blobstore no docker
+    image: postgres:9.6
+    container_name: shopee-api-blobstore-postgres # Nome do container
+    restart: always
+    environment:
+      POSTGRES_USER: ${USER_BD_BLOBSTORE} # Usuário do BD
+      POSTGRES_PASSWORD: ${PASS_BD_BLOBSTORE} # Senha do BD
+      POSTGRES_DB: ${NAME_BD_BLOBSTORE} # Nome do BD
+    ports:
+      - ${PORT_BD_BLOBSTORE}:${PORT_POSTGRES} # Porta do BD : porta padrão
+    volumes:
+      - ./shopee-bd-blobstore:/var/lib/postgresql/data
