@@ -2,7 +2,6 @@
 
 package br.com.ifpe.shopee.config;
 
-// ... (Imports existentes) ...
 import java.net.URLEncoder; 
 import java.nio.charset.StandardCharsets; 
 import com.mongodb.client.MongoClient;

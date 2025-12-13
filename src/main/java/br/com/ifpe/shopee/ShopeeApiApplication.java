@@ -22,5 +22,4 @@ public class ShopeeApiApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(ShopeeApiApplication.class, args);
 	}
-
 }

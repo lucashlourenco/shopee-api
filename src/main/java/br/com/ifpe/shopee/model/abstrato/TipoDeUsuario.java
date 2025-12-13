@@ -2,11 +2,14 @@
 
 package br.com.ifpe.shopee.model.abstrato;
 
+import java.time.LocalDateTime;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import br.com.ifpe.shopee.model.bd_principal.entity.Usuario;
 import br.com.ifpe.shopee.model.bd_principal.entity.contato.ContatoDeUsuario;
-import br.com.ifpe.shopee.util.entity.bd_relacional.EntidadeAuditavelJPA;
+import br.com.ifpe.shopee.util.entity.bd_relacional.EntidadeNegocioJPA;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
@@ -28,10 +31,14 @@ import lombok.Setter;
 @Table(name = "tipo_de_usuario")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE) // Unifica em uma tabela
 @DiscriminatorColumn(name = "tipo", discriminatorType = DiscriminatorType.STRING) // Coluna para saber qual tipo é
-public abstract class TipoDeUsuario extends EntidadeAuditavelJPA {
+public abstract class TipoDeUsuario extends EntidadeNegocioJPA {
 
 	@Column
 	private String nome;
+
+	@Column(name = "data_de_cadastro")
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
+    private LocalDateTime dataDeCadastro;
 
 	@ManyToOne
 	// @JoinColumn(name = "id_usuario", nullable = false)						|> Ruinm para a compra
