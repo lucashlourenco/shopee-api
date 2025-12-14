@@ -34,7 +34,7 @@ public class DBSecundarioConfig {
 
         // Conversão segura do char[] para String
         String username = new String(props.getUsername());
-        String password = new String(props.getPassword()); // 👈 AQUI ESTÁ A CORREÇÃO!
+        String password = new String(props.getPassword());
 
         try {
             // Codifica o usuário e a senha para garantir que caracteres especiais funcionem

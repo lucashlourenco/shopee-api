@@ -28,9 +28,9 @@ public class DBPrincipalConfig {
     // Pacote onde o Spring deve escanear as classes de Entidade (@Entity) do BD
     // principal da aplicação
     private static final String PACOTE_ENTITY = "br.com.ifpe.shopee.model.bd_principal.entity";
-    private static final String PACOTE_BLOBSTORE = "br.com.ifpe.shopee.model.bd_blobstore";
-    private static final String PACOTE_UTIL = "br.com.ifpe.shopee.util.entity.bd_relacional";
-    private static final String PACOTE_ABSTRATO = "br.com.ifpe.shopee.model.abstrato";
+    // private static final String PACOTE_BLOBSTORE = "br.com.ifpe.shopee.model.bd_blobstore";
+    // private static final String PACOTE_UTIL = "br.com.ifpe.shopee.util.entity.bd_relacional";
+    // private static final String PACOTE_ABSTRATO = "br.com.ifpe.shopee.model.abstrato";
 
     // Injetando o valor explicitamente do application.properties
     @Value("${bd-principal.datasource.url}")

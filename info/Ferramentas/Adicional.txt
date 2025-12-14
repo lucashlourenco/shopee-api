@@ -1,0 +1,7 @@
+   	O DBeaver é uma ferramenta usada no contexto deste projeto para acompanha os bancos de dados,
+mas a versão Community (gratuita) não conecta com o Mongo. Use a ferramenta padrão, o Compass.
+
+ + Use a string de conexão:
+mongodb://${USER_BD_SECUNDARIA}:${PASS_BD_SECUNDARIA}@localhost:${PORT_BD_SECUNDARIA}/?authSource=admin
+
+Obs.: troque pelo valor das variáveis definidas no .env.

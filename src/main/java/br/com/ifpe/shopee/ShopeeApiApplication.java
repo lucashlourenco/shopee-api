@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfigurat
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication(exclude = {
@@ -17,6 +18,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 	HibernateJpaAutoConfiguration.class		// Exclui a autoconfiguração do JPA/Hibernate
 })
 @EnableScheduling
+@EnableJpaAuditing
 public class ShopeeApiApplication {
 
 	public static void main(String[] args) {
