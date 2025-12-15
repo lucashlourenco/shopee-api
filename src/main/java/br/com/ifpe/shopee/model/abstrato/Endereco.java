@@ -42,7 +42,7 @@ public class Endereco extends EntidadeAuditavelJPA {
 	@Column
 	private String complemento;
 
+	// Ponto de referência para o endereço.
 	@Column
 	private String referencia;
-
 }

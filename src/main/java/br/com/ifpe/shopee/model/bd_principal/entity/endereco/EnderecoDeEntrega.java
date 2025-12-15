@@ -9,7 +9,7 @@ import org.hibernate.annotations.SQLRestriction;
 import br.com.ifpe.shopee.model.abstrato.Endereco;
 import br.com.ifpe.shopee.model.bd_principal.entity.CarrinhoDeCompra;
 import br.com.ifpe.shopee.model.bd_principal.entity.Cliente;
-
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -30,6 +30,14 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EnderecoDeEntrega extends Endereco {
+
+    // Nome de um endereço de entrega.
+    @Column
+    private String nome;
+
+    // Nome da pessoa principal que recebe no endereço (pode não ser o destinatário...).
+    @Column
+    private String recebedor;
 
     @ManyToOne
     @JoinColumn(name = "id_cliente")

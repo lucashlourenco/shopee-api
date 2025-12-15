@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import br.com.ifpe.shopee.util.exception.AdvertenciaException;
 import br.com.ifpe.shopee.util.exception.EntidadeDuplicadaException;
 import br.com.ifpe.shopee.util.exception.RecursoNaoEncontradoException;
 
@@ -27,5 +28,11 @@ public class ApiExceptionHandler {
     public ResponseEntity<?> handleEntidadeDuplicada(EntidadeDuplicadaException ex) {
         // Usa o status 409 definido no @ResponseStatus da exceção
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    }
+
+    // Trata exceções do tipo 422
+    @ExceptionHandler(AdvertenciaException.class)
+    public ResponseEntity<?> handleAdvertencia(AdvertenciaException ex) {
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(ex.getMessage());
     }
 }

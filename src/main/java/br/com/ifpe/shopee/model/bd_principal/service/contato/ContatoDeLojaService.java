@@ -47,7 +47,7 @@ public class ContatoDeLojaService {
      * @return O ContatoDeLoja salvo.
      */
     @Transactional
-    public ContatoDeLoja adicionarContatodeLoja(UUID idLoja, ContatoDeLoja novoContato) {
+    public ContatoDeLoja adicionarContatoDeLoja(UUID idLoja, ContatoDeLoja novoContato) {
         // Verificar e obter a Loja
         // TODO: LojaService.obterPorID lança RecursoNaoEncontradoException
         Loja loja = lojaService.obterPorID(idLoja);

@@ -13,8 +13,8 @@ import br.com.ifpe.shopee.model.bd_principal.entity.contato.ContatoDeLoja;
 import br.com.ifpe.shopee.model.bd_principal.entity.contato.ContatoDeUsuario;
 import br.com.ifpe.shopee.model.bd_principal.repository.contato.ContatoDeUsuarioRepository;
 import br.com.ifpe.shopee.model.bd_principal.service.UsuarioService;
-import br.com.ifpe.shopee.util.exception.EntidadeDuplicadaException; 
-import br.com.ifpe.shopee.util.exception.RecursoNaoEncontradoException; 
+import br.com.ifpe.shopee.util.exception.EntidadeDuplicadaException;
+import br.com.ifpe.shopee.util.exception.RecursoNaoEncontradoException;
 import jakarta.transaction.Transactional;
 
 @Service
