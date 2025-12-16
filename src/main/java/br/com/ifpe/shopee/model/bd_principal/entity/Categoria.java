@@ -1,12 +1,12 @@
-// src/main/java/br/com/ifpe/shopee/model/bd_principal/Categoria.java
-
 package br.com.ifpe.shopee.model.bd_principal.entity;
 
 import java.util.List;
 
 import org.hibernate.annotations.SQLRestriction;
 
-import br.com.ifpe.shopee.util.entity.bd_relacional.EntidadeNegocioJPA;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import br.com.ifpe.shopee.util.entity.bd_relacional.EntidadeAuditavelJPA;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -32,33 +32,34 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Categoria extends EntidadeNegocioJPA {
+// MUDANÇA 2: Estender EntidadeAuditavelJPA (para ter as datas)
+public class Categoria extends EntidadeAuditavelJPA {
 
-	@NotBlank(message = "O nome é obrigatório.")
-	@Column(nullable = false)
-	private String nome;
+    @NotBlank(message = "O nome é obrigatório.")
+    @Column(nullable = false)
+    private String nome;
 
-	@Column
-	private boolean estaAtiva;
+    @Column
+    private Boolean estaAtiva; // Mudei para Boolean (Wrapper) para evitar problemas com null no update
 
-	// Mapeamento de lista de tipos básicos (String)
-	@ElementCollection
-	@CollectionTable(name = "categoria_marcas_reconhecidas", joinColumns = @JoinColumn(name = "id_categoria"))
-	@Column(name = "marca_reconhecida") // Nome da coluna na nova tabela
-	private List<String> marcasReconhecidas;
+    @ElementCollection
+    @CollectionTable(name = "categoria_marcas_reconhecidas", joinColumns = @JoinColumn(name = "id_categoria"))
+    @Column(name = "marca_reconhecida")
+    private List<String> marcasReconhecidas;
 
-    @ManyToOne // Uma categoria filha tem um único pai
+    @ManyToOne
     @JoinColumn(name = "id_categoria_pai")
+    @JsonIgnore
     private Categoria pai;
 
-    @OneToMany(mappedBy = "pai") // O relacionamento é mapeado pelo campo "pai" na entidade Categoria
+    @OneToMany(mappedBy = "pai")
     private List<Categoria> filhas;
 
-	@ManyToMany
-	@JoinTable(
-    	name = "categoria_tipo_caracteristica", // Nome da tabela de junção
-    	joinColumns = @JoinColumn(name = "id_categoria"),
-    	inverseJoinColumns = @JoinColumn(name = "id_tipo_caracteristica")
-	)
-	private List<TipoDeCaracteristica> caracteristicas;
+    @ManyToMany
+    @JoinTable(
+        name = "categoria_tipo_caracteristica",
+        joinColumns = @JoinColumn(name = "id_categoria"),
+        inverseJoinColumns = @JoinColumn(name = "id_tipo_caracteristica")
+    )
+    private List<TipoDeCaracteristica> caracteristicas;
 }
