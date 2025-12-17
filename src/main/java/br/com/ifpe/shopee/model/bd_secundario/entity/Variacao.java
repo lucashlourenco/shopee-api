@@ -16,6 +16,7 @@ import br.com.ifpe.shopee.model.enums.EstadoDeProdutoEnum;
 import br.com.ifpe.shopee.model.enums.StatusDeProdutoEnum;
 import br.com.ifpe.shopee.util.entity.bd_nao_relacional.EntidadeAuditavelData;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,9 +24,14 @@ import lombok.Setter;
 @Document(collection = "variacao")
 @Getter
 @Setter
+@Builder // Adicionado para facilitar a criação de objetos
 @AllArgsConstructor
 @NoArgsConstructor
 public class Variacao extends EntidadeAuditavelData {
+
+    // --- CAMPO NOVO (CRÍTICO PARA O CHECKOUT) ---
+    private Double preco; 
+    // --------------------------------------------
 
     private EstadoDeProdutoEnum estado;
     private String nome;
@@ -49,9 +55,11 @@ public class Variacao extends EntidadeAuditavelData {
     private List<Caracteristica> caracteristicas;
 
     // --- RELACIONAMENTO COM PRODUTO ---
+    // Mantendo sua estratégia correta de ID + Transient
     @Transient
     private Produto produto;
-    @JsonIgnore
+    
+    // Removi o @JsonIgnore do idProduto, pois o Front pode precisar saber o ID do pai
     private UUID idProduto; 
 
     // --- RELACIONAMENTOS COM POSTGRES (IDs ÚNICOS) ---

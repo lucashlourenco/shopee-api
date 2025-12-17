@@ -1,5 +1,3 @@
-// src/main/java/br/com/ifpe/shopee/model/bd_principal/entity/Envio.java
-
 package br.com.ifpe.shopee.model.bd_principal.entity;
 
 import java.util.List;
@@ -7,7 +5,7 @@ import java.util.List;
 import org.hibernate.annotations.SQLRestriction;
 
 import br.com.ifpe.shopee.util.entity.bd_relacional.EntidadeAuditavelJPA;
-
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
@@ -27,23 +25,24 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Envio extends EntidadeAuditavelJPA{
+public class Envio extends EntidadeAuditavelJPA {
 
-	@Column
-	private double preco;
+    @Column
+    private double preco;
 
-	@Column
-	private String transportadora;
+    @Column
+    private String transportadora;
 
-	@Column
-	private int prazoDeEntrega;
+    @Column
+    private int prazoDeEntrega;
 
-	@Column
-	private String codigoDeRastreio;
+    @Column
+    private String codigoDeRastreio;
 
-	@OneToMany(mappedBy = "envio")
-	private List<StatusDeEnvio> statusDeEnvios;
+    // ROBUSTEZ: Cascade permite salvar o envio e seus status de uma vez só
+    @OneToMany(mappedBy = "envio", cascade = CascadeType.ALL)
+    private List<StatusDeEnvio> statusDeEnvios;
 
-	@OneToOne(mappedBy = "envio")
-	private ItemDeCarrinho itemDeCarrinho;
+    @OneToOne(mappedBy = "envio")
+    private ItemDeCarrinho itemDeCarrinho;
 }

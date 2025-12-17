@@ -1,26 +1,39 @@
-// src/main/java/br/com/ifpe/shopee.model.bd_secundario.entity/RespostaDePagamento.java
-
 package br.com.ifpe.shopee.model.bd_secundario.entity;
 
-// REMOVER: import br.com.ifpe.shopee.util.entity.bd_nao_relacional.EntidadeNegocioData;
-// REMOVER: import org.springframework.data.mongodb.core.mapping.Document;
-// Esta classe é apenas o subdocumento (Não herda, não tem @Document)
+import java.time.LocalDateTime;
+import java.util.Map;
 
-import org.springframework.data.mongodb.core.mapping.Field;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
+@Data
 @Builder
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class RespostaDePagamento {
+    
+    // --- DO SEU CÓDIGO ORIGINAL (Mantidos) ---
+    private String idTransacaoExterna; // ID do Gateway (Stripe/PayPal)
+    private Double valor;
+    private String formaDePagamento;
+    private Integer nDeVezes;
+    private String urlComprovante;
 
-    // status, valor, formaDePagamento, nDeVezes... Uma emulação de resposta de um pedido de pagamento
-    @Field("resposta_de_pagamento")
-    private Object respostaDePagamento;
+    // --- CAMPOS DE ROBUSTEZ (Adicionados para Auditoria) ---
+    
+    // Status que veio do Gateway (ex: "authorized", "failed", "pending")
+    // Diferente do nosso StatusDePagamentoEnum, este é o texto puro da operadora.
+    private String statusOperadora; 
+    
+    @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
+    private LocalDateTime dataTransacao;
+    
+    // Guarda o JSON bruto da resposta (Vital para debug se o cliente reclamar)
+    private Map<String, Object> payloadCompleto;
+    
+    private String mensagemErro; // Caso o gateway recuse
 }

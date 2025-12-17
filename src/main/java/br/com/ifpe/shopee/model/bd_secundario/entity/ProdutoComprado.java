@@ -1,12 +1,10 @@
-// src/main/java/br/com/ifpe/shopee/model/bd_secundario/entity/ProdutoComprado.java
-
 package br.com.ifpe.shopee.model.bd_secundario.entity;
 
 import java.util.UUID;
 
 import org.springframework.data.mongodb.core.mapping.Document;
-import br.com.ifpe.shopee.util.entity.bd_nao_relacional.EntidadeNegocioData;
 
+import br.com.ifpe.shopee.util.entity.bd_nao_relacional.EntidadeAuditavelData;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,7 +17,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProdutoComprado extends EntidadeNegocioData {
+public class ProdutoComprado extends EntidadeAuditavelData {
 
     // ID original do produto
     private UUID idProduto;
@@ -27,12 +25,12 @@ public class ProdutoComprado extends EntidadeNegocioData {
     // ID da variação original escolhida
     private UUID idVariacao;
 
-    // ID do item de carrinho original - registro permanece no bd_principal inalterável (sem edição por usuário)
+    // ID do item de carrinho original (que fica no Postgres/bd_principal)
     private UUID idItemDeCarrinho;
 
-    // Por comodidade, inclui aqui a variação inteira que foi comprada; cópia da variação original
+    // Cópia PROFUNDA (Snapshot)
+    // Ao salvar aqui, o objeto Variacao inteiro é serializado dentro do documento.
     private Variacao variacaoComprada;
 
-    // O produto inteiro; cópia do produto original
     private Produto produto;
 }

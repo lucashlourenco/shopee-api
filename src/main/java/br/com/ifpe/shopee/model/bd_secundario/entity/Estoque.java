@@ -1,37 +1,32 @@
-// src/main/java/br/com/ifpe/shopee/model/bd_secundario/entity/Estoque.java
-
 package br.com.ifpe.shopee.model.bd_secundario.entity;
 
-import java.util.Date;
-
-import org.springframework.data.mongodb.core.mapping.Field;
-import com.fasterxml.jackson.annotation.JsonFormat;
+import java.util.Date; // O diagrama pede Date, mas LocalDateTime é melhor. Mantenha Date se preferir seguir estrito.
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
+@Data
 @Builder
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Estoque {
+    
+    // Conforme Diagrama
+    private int id; // Pode ser int ou UUID dependendo da sua padronização interna
+    private Double preco;
+    private int qtdInicial;
+    private int qtdVendida;
+    private Date dataFinal;
 
-	private double preco;
+    // --- CORREÇÃO DO ERRO ---
+    // Adicionamos este campo para facilitar a lógica do CarrinhoService
+    // Ou ele pode ser calculado: (qtdInicial - qtdVendida)
+    private int qtdAtual; 
 
-	@Field("qtd_inicial")					// Definindo o nome do campo no banco
-	private int qtdInicial;
-
-	@Field("qtd_vendida")					// Definindo o nome do campo no banco
-	private int qtdVendida;
-
-	// Formatar em dd/MM/yyyy
-	@JsonFormat(pattern = "dd/MM/yyyy")
-	private Date dataFinal;
-
-	// O estoque é de uma variacao e a variacao tem um estoque
-	// O estoque será incorporado na variacao
+    // Se preferir calculado (apague o campo acima e use este método):
+    // public int getQtdAtual() {
+    //    return this.qtdInicial - this.qtdVendida;
+    // }
 }

@@ -1,5 +1,3 @@
-// src/main/java/br/com/ifpe/shopee/model/bd_principal/entity/CarrinhoDeCompra.java
-
 package br.com.ifpe.shopee.model.bd_principal.entity;
 
 import java.util.List;
@@ -7,7 +5,8 @@ import java.util.List;
 import org.hibernate.annotations.SQLRestriction;
 
 import br.com.ifpe.shopee.model.bd_principal.entity.endereco.EnderecoDeEntrega;
-import br.com.ifpe.shopee.util.entity.bd_relacional.EntidadeNegocioJPA;
+import br.com.ifpe.shopee.util.entity.bd_relacional.EntidadeAuditavelJPA; // <--- IMPORTANTE
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -28,15 +27,17 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CarrinhoDeCompra extends EntidadeNegocioJPA {
-	@OneToOne
-	@JoinColumn(name = "id_cliente", unique = true)
-	private Cliente cliente;
+// MUDANÇA AQUI: De EntidadeNegocioJPA para EntidadeAuditavelJPA
+public class CarrinhoDeCompra extends EntidadeAuditavelJPA { 
+    
+    @OneToOne
+    @JoinColumn(name = "id_cliente", unique = true)
+    private Cliente cliente;
 
-	@ManyToOne
-	@JoinColumn(name = "id_endereco")
-	private EnderecoDeEntrega enderecoDeEntrega;
+    @ManyToOne
+    @JoinColumn(name = "id_endereco")
+    private EnderecoDeEntrega enderecoDeEntrega;
 
-	@OneToMany(mappedBy = "carrinho")
-	private List<ItemDeCarrinho> itens;
+    @OneToMany(mappedBy = "carrinho", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ItemDeCarrinho> itens;
 }

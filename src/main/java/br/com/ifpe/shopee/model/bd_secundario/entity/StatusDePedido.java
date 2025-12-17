@@ -1,29 +1,38 @@
-// src/main/java/br/com/ifpe/shopee.model.bd_secundario.entity/StatusDePedido.java
-
 package br.com.ifpe.shopee.model.bd_secundario.entity;
 
 import java.time.LocalDateTime;
-import br.com.ifpe.shopee.model.enums.StatusDePedidoEnum;
+import java.util.UUID;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import br.com.ifpe.shopee.model.enums.StatusDePedidoEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
+@Data
 @Builder
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class StatusDePedido {
 
-    // Incorporado no Pedido (poderá ser no PedidoDeVendedor ou PedidoDeCliente)
+    @Builder.Default
+    private String id = UUID.randomUUID().toString();
 
     private StatusDePedidoEnum status;
 
     @Builder.Default
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime dataDeRegistro = LocalDateTime.now();
+    
+    private String observacao;
+
+    // Método utilitário para facilitar a criação no Service
+    public static StatusDePedido criar(StatusDePedidoEnum status, String observacao) {
+        return StatusDePedido.builder()
+            .status(status)
+            .observacao(observacao)
+            .build(); // Data e ID são gerados automaticamente pelo @Builder.Default
+    }
 }
