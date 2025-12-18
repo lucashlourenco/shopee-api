@@ -7,7 +7,7 @@ import br.com.ifpe.shopee.model.bd_principal.request.contato.abstrato.ContatoBas
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.experimental.SuperBuilder; // ALTERADO: De @Builder para @SuperBuilder
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter

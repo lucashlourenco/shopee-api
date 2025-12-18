@@ -21,9 +21,10 @@ public class EnderecoDeEstoqueService {
 
     @Autowired
     private EnderecoDeEstoqueRepository repository;
-    
+    /*
     @Autowired 
-    private VariacaoService variacaoService;
+    private VariacaoService variacaoService; // TODO: Fazer a VariaçãoService
+    */
 
     /**
      * Retorna um endereço existente com base na semântica,
@@ -63,7 +64,7 @@ public class EnderecoDeEstoqueService {
      */
     public EnderecoDeEstoque obterPorID(UUID id) {
         return repository.findById(id)
-                         .orElseThrow(() -> new RecursoNaoEncontradoException("Endereço de Estoque não encontrado com ID: " + id));
+                         .orElseThrow(() -> new RecursoNaoEncontradoException("Endereço de Estoque não encontrado com ID: " + id + "."));
     }
 
     /**
@@ -72,6 +73,7 @@ public class EnderecoDeEstoqueService {
      * @param enderecoAlterado A Entidade EnderecoDeEstoque (com os novos dados).
      * @return O novo endereço de estoque a ser usado (o original alterado OU um novo/existente).
      */
+    /**
     @Transactional
     public EnderecoDeEstoque alterarEndereco(UUID idEnderecoAtual, EnderecoDeEstoque enderecoAlterado) {
         
@@ -123,7 +125,7 @@ public class EnderecoDeEstoqueService {
                 throw new AdvertenciaException("Este endereço de estoque é compartilhado e não pode ser alterado.");
             }
         }
-    }
+    } */
 
     /**
      * Apaga um endereço de cadastro (exclusão lógica).

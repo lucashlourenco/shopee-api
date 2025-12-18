@@ -15,7 +15,6 @@ import br.com.ifpe.shopee.model.bd_principal.service.LojaService;
 import br.com.ifpe.shopee.util.exception.EntidadeDuplicadaException;
 import br.com.ifpe.shopee.util.exception.RecursoNaoEncontradoException;
 import jakarta.transaction.Transactional;
-import jakarta.persistence.EntityNotFoundException; // Para quando a Loja não for encontrada
 
 @Service
 public class ContatoDeLojaService {

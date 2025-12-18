@@ -25,9 +25,6 @@ public class DBBlobstoreConfig {
     // Pacote onde o Spring deve escanear as classes de Entidade (@Entity) da
     // blobstore
     private static final String PACOTE_ENTITY = "br.com.ifpe.shopee.model.bd_blobstore.entity";
-    // private static final String PACOTE_BLOBSTORE = "br.com.ifpe.shopee.model.bd_blobstore";
-    // private static final String PACOTE_UTIL = "br.com.ifpe.shopee.util.entity.bd_relacional";
-    // private static final String PACOTE_ABSTRATO = "br.com.ifpe.shopee.model.abstrato";
 
     // Injetando valores explicitamente do application.properties
     @Value("${bd-blobstore.datasource.url}")

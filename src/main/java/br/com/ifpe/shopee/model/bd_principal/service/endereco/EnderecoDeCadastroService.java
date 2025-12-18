@@ -70,21 +70,19 @@ public class EnderecoDeCadastroService {
     @Transactional
     public EnderecoDeCadastro alterarEndereco(UUID idEnderecoAtual, EnderecoDeCadastro enderecoAlterado) {
         
-        // TODO: A pessoa deve fazer o gerenciamneto da ligação entre EnderecoDeCadastro e Pessoa.
         EnderecoDeCadastro enderecoOriginal = obterPorID(idEnderecoAtual);
 
         // 1. Verifica se o novo endereço (com os dados alterados) já existe, se não, cria.
         EnderecoDeCadastro novoEnderecoUnico = adicionarOuEncontarEnderecoDeCadastro(enderecoAlterado);
 
         // Se o novo endereço encontrado tiver o mesmo ID do original, significa que a loja está em endereço já cadastrado.
-
         // 2. Se a semântica mudou (e gerou um novo/existente diferente):
         if (!enderecoOriginal.getId().equals(novoEnderecoUnico.getId())) {
             
-            // A PessoaService se encarregarLayouto de:
+            // Quem chamar essa rotina deve se encarregarLayouto de:
             // 1) Desassociar a pessoa do enderecoOriginal;
             // 2) Associar a pessoa ao novoEnderecoUnico;
-            // 3) Deletar o EnderecoOriginal se a PessoaService ao se desassociar da lista de pessoas ficar vazia.
+            // 3) Só depois, pedir aqui ao EnderecoDeCadastroService para limparSeOrfao se o original ficou "órfao".
             return novoEnderecoUnico;
         }
         
@@ -123,5 +121,19 @@ public class EnderecoDeCadastroService {
         EnderecoDeCadastro endereco = obterPorID(id);
         endereco.setHabilitado(Boolean.FALSE);
         return repository.save(endereco);
+    }
+
+    /**
+     * Verifica se um endereço não possui mais ninguém vinculado a ele.
+     * @param idEndereco O ID do endereço.
+     */
+    @Transactional
+    public boolean limparSeOrfao(UUID idEndereco) {
+        EnderecoDeCadastro endereco = obterPorID(idEndereco);
+        if (endereco.getPessoas() == null || endereco.getPessoas().isEmpty()) {
+            apagarEndereco(idEndereco);
+            return true;
+        }
+        return false;
     }
 }

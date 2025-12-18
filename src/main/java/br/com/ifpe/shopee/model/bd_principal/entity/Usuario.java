@@ -48,6 +48,7 @@ public class Usuario extends EntidadeAuditavelJPA {
 	@NotNull(message = "O usuário precisa está associado a uma pessoa.")
 	private Pessoa pessoa;
 
+	// TODO: Considerar mudar para OneToOne. 
 	@OneToMany(mappedBy = "usuario")
 	private List<TipoDeUsuario> tipos;
 

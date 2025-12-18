@@ -9,10 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.ifpe.shopee.model.abstrato.TipoDeUsuario;
-import br.com.ifpe.shopee.model.bd_principal.entity.contato.ContatoDeLoja;
 import br.com.ifpe.shopee.model.bd_principal.entity.contato.ContatoDeUsuario;
 import br.com.ifpe.shopee.model.bd_principal.repository.contato.ContatoDeUsuarioRepository;
-import br.com.ifpe.shopee.model.bd_principal.service.UsuarioService;
+import br.com.ifpe.shopee.model.bd_principal.service.ClienteService;
 import br.com.ifpe.shopee.util.exception.EntidadeDuplicadaException;
 import br.com.ifpe.shopee.util.exception.RecursoNaoEncontradoException;
 import jakarta.transaction.Transactional;
@@ -22,9 +21,9 @@ public class ContatoDeUsuarioService {
 
     @Autowired
     private ContatoDeUsuarioRepository repository;
-
+    
     @Autowired
-    private UsuarioService usuarioService; // Usado para buscar o usuário principal
+    private ClienteService clienteService; // Usado para buscar o usuário principal
 
     /**
      * Serviço para obter um contato de usuário pelo ID.
@@ -47,8 +46,7 @@ public class ContatoDeUsuarioService {
     @Transactional
     public ContatoDeUsuario adicionarContatoUsuario(UUID idUsuario, ContatoDeUsuario novoContato) {
         // Verificar e obter a Loja
-        // TODO: UsuarioService.obterPorID lança RecursoNaoEncontradoException
-        TipoDeUsuario usuario = usuarioService.obterPorID(idUsuario); // Assume que lança RecursoNaoEncontradoException
+        TipoDeUsuario usuario = clienteService.obterPorID(idUsuario);
 
         // Verificar unicidade (Regra: Usuario + Valor + Tipo deve ser único)
         ContatoDeUsuario contatoExistente = repository.findByUsuarioIdAndValorAndTipo(
