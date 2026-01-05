@@ -2,7 +2,10 @@
 
 package br.com.ifpe.shopee.model.bd_principal.request;
 
+import br.com.ifpe.shopee.model.bd_principal.request.contato.ContatoDeLoginRequest;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,8 +15,9 @@ import lombok.Setter;
 @Builder
 public class UsuarioRequest {
     
-    @NotBlank(message = "O login de contato (email/telefone) é obrigatório.")
-    private String login;
+    @Valid // Garante que as anotações dentro de ContatoDeLoginRequest sejam validadas
+    @NotNull(message = "Os dados de login são obrigatórios.")
+    private ContatoDeLoginRequest login;
 
     @NotBlank(message = "A senha é obrigatória.")
     private String senha;

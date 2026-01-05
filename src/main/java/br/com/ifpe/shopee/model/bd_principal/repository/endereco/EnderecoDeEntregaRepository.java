@@ -3,6 +3,7 @@
 package br.com.ifpe.shopee.model.bd_principal.repository.endereco;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,4 +18,19 @@ public interface EnderecoDeEntregaRepository extends JpaRepository<EnderecoDeEnt
      * @return Lista de EnderecoDeEntrega.
      */
     List<EnderecoDeEntrega> findByClienteId(UUID idCliente);
+
+    /**
+     * Consulta para buscar um endereço pela sua unicidade semântica de endereço de entrega:
+     * Endereços que tenham os mesmos cep, rua, bairro, cidade, estado, numero, complemento e nome são iguais.
+     */
+    Optional<EnderecoDeEntrega> findByCepAndRuaAndBairroAndCidadeAndEstadoAndNumeroAndComplementoAndNome(
+        String cep,
+        String rua,
+        String bairro,
+        String cidade,
+        String estado,
+        String numero, 
+        String complemento,
+        String nome
+    );
 }

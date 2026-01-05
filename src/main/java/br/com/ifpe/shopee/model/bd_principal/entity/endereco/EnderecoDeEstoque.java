@@ -7,13 +7,17 @@ import java.util.Objects;
 
 import org.hibernate.annotations.SQLRestriction;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import br.com.ifpe.shopee.model.abstrato.Endereco;
 import br.com.ifpe.shopee.model.bd_principal.entity.InformacaoDeRetirada;
+import br.com.ifpe.shopee.model.bd_principal.entity.Loja;
 import br.com.ifpe.shopee.model.bd_secundario.entity.Variacao;
 
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
@@ -21,6 +25,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Table(name = "endereco_de_estoque")
@@ -30,17 +35,23 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString(exclude = {"lojas", "variacoes"})
 public class EnderecoDeEstoque extends Endereco {
 
     // Nome de um endereço de estoque.
     @Column
     private String nome;
 
-    @OneToMany(mappedBy = "endereco")
-    private List<InformacaoDeRetirada> informacoesDeRetirada;
+    @ManyToMany(mappedBy = "depositos")
+    @JsonIgnore
+    private List<Loja> lojas;
 
     @Transient
     private List<Variacao> variacoes;
+
+    @OneToMany(mappedBy = "endereco")
+    @JsonIgnore
+    private List<InformacaoDeRetirada> informacoesDeRetirada;
 
     @Override
     public int hashCode() {

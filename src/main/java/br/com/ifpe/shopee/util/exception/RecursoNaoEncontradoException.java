@@ -1,4 +1,4 @@
-// src/main/java/br/com/ifpe/shopee/util/exception/a.java
+// src/main/java/br/com/ifpe/shopee/util/exception/RecursoNaoEncontradoException.java
 
 package br.com.ifpe.shopee.util.exception;
 

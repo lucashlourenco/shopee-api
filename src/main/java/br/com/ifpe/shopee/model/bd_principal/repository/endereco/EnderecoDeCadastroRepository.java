@@ -6,6 +6,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import br.com.ifpe.shopee.model.bd_principal.entity.endereco.EnderecoDeCadastro;
 
@@ -24,4 +26,10 @@ public interface EnderecoDeCadastroRepository extends JpaRepository<EnderecoDeCa
         String numero, 
         String complemento
     );
+
+    /**
+     * Conta quantas pessoas estão vinculadas a este endereço via SQL.
+     */
+    @Query("SELECT COUNT(p) FROM Pessoa p WHERE p.endereco.id = :idEndereco AND p.habilitado = true")
+    long contarPessoasVinculadas(@Param("idEndereco") UUID idEndereco);
 }

@@ -3,11 +3,11 @@
 package br.com.ifpe.shopee.model.bd_principal.entity;
 
 import java.util.Date;
-import java.util.List;
 
 import org.hibernate.annotations.SQLRestriction;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import br.com.ifpe.shopee.model.bd_principal.entity.endereco.EnderecoDeCadastro;
 import br.com.ifpe.shopee.util.entity.bd_relacional.EntidadeAuditavelJPA;
@@ -16,7 +16,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -24,6 +24,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Table(name = "pessoa")
@@ -40,7 +41,7 @@ public class Pessoa extends EntidadeAuditavelJPA {
 	private String nomeCompleto;
 
 	@NotBlank(message = "O CPF é obrigatório.")
-	@Column(nullable = false)
+	@Column(nullable = false, unique = true)
 	private String cpf;
 
 	@Column
@@ -54,6 +55,8 @@ public class Pessoa extends EntidadeAuditavelJPA {
 	@JoinColumn(name = "id_endereco")
 	private EnderecoDeCadastro endereco;
 
-	@OneToMany(mappedBy = "pessoa")
-	private List<Usuario> usuarios;
+	@OneToOne(mappedBy = "pessoa")
+	@JsonIgnore
+	@ToString.Exclude
+	private Usuario usuario;
 }

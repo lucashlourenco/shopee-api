@@ -28,11 +28,11 @@ public interface PessoaRepository extends JpaRepository<Pessoa, UUID> {
     boolean existsByCpf(String cpf);
 
     /**
-     * Conta quantos Usuários ATIVOS estão vinculados a esta Pessoa.
-     * O filtro habilitado = true é garantido pelo @SQLRestriction na entidade Usuario.
+     * Verifica se uma Pessoa possui algum usuário ativo.
+     * 
      * @param pessoaId O ID da Pessoa.
-     * @return O número de Usuários ativos.
+     * @return true se a Pessoa possui um usuário ativo.
      */
-    @Query("SELECT COUNT(u) FROM Usuario u WHERE u.pessoa.id = :pessoaId")
-    long countUsuariosAtivosByPessoaId(@Param("pessoaId") UUID pessoaId);
+    @Query("SELECT CASE WHEN COUNT(u) > 0 THEN true ELSE false END FROM Usuario u WHERE u.pessoa.id = :pessoaId AND u.habilitado = true")
+    boolean existeUsuarioAtivoParaPessoa(@Param("pessoaId") UUID pessoaId);
 }

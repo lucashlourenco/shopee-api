@@ -16,8 +16,19 @@ public interface ContatoDeLoginRepository extends JpaRepository<ContatoDeLogin, 
      * Esta é a consulta principal para:
      * 1. Autenticação (verificar se o login existe).
      * 2. Validação de Unicidade Global antes de um novo cadastro.
+     * 
      * @param valor O valor do contato (email/telefone).
      * @return Optional contendo o ContatoDeLogin, se encontrado.
      */
     Optional<ContatoDeLogin> findByValor(String valor);
+
+    /**
+     * Busca todos os contatos de login de um Usuário.
+     */
+    Iterable<ContatoDeLogin> findByUsuarioId(UUID idUsuario);
+
+    /**
+     * Conta quantos contatos de login (credenciais) de um Usuário estão ativos.
+     */
+    long countByUsuarioIdAndHabilitadoTrue(UUID idUsuario);
 }

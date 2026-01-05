@@ -3,51 +3,24 @@
 package br.com.ifpe.shopee.util;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Component;
 
 @Component
 public class MidiaStorageUtil {
 
-    // Injeta o caminho raiz a partir do application.properties
+    // Injeta o caminho da pasta onde serão salvos os arquivos.
+    // Definido em uma variável de application.properties
     @Value("${midia.storage.root}")
     private String localRaizStorage;
-
-    /**
-     * Deleta o arquivo físico do disco.
-     * 
-     * @param caminhoStorage O caminho relativo (ex: usuario123/produto/UUID.jpg)
-     * @throws IOException Se a exclusão falhar
-     */
-    public void deletarArquivoFisico(String caminhoStorage) throws IOException {
-        if (caminhoStorage == null || caminhoStorage.trim().isEmpty()) {
-            throw new IllegalArgumentException("Caminho do arquivo não pode ser nulo.");
-        }
-
-        // Constrói o caminho completo (raiz + caminho relativo)
-        Path caminhoCompleto = Paths.get(this.localRaizStorage, caminhoStorage);
-
-        if (Files.exists(caminhoCompleto)) {
-            // Tenta deletar o arquivo
-            boolean deleted = Files.deleteIfExists(caminhoCompleto);
-
-            if (!deleted) {
-                // Lança exceção se, por algum motivo (permissão, bloqueio), o arquivo existir,
-                // mas não puder ser deletado
-                throw new IOException("Arquivo encontrado, mas não pôde ser deletado: " + caminhoCompleto);
-            }
-        } else {
-            // Tratamento suave: Se o registro está no BD, mas o arquivo sumiu (problema prévio),
-            // o GC deve deletar o registro do BD mesmo assim.
-            System.out.println("Aviso: Arquivo físico não encontrado em " + caminhoCompleto
-                    + ". Deletando apenas registro do BD.");
-        }
-    }
 
     /**
      * Método auxiliar para salvar o arquivo e retornar o caminho relativo (caminhoStorage).
@@ -78,5 +51,60 @@ public class MidiaStorageUtil {
 
         // 3. Retorna o caminho RELATIVO para salvar no BD
         return diretorioRelativo + "/" + nomeArquivo;
+    }
+
+    /**
+     * Carrega o arquivo do disco como um Recurso (Resource) para download/visualização.
+     * 
+     * @param caminhoStorage O caminho relativo salvo no banco.
+     * @return Resource do arquivo.
+     */
+    public Resource carregarArquivo(String caminhoStorage) {
+        try {
+            Path caminhoCompleto = Paths.get(this.localRaizStorage, caminhoStorage);
+            Resource recurso = new UrlResource(caminhoCompleto.toUri());
+
+            if (recurso.exists() || recurso.isReadable()) {
+                return recurso;
+            }
+            else {
+                throw new RuntimeException("Falha ao ler arquivo: '" + caminhoStorage + "'");
+            }
+        }
+        
+        catch (MalformedURLException e) {
+            throw new RuntimeException("Erro: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Deleta o arquivo físico do disco.
+     * 
+     * @param caminhoStorage O caminho relativo (ex: usuario123/produto/UUID.jpg)
+     * @throws IOException Se a exclusão falhar
+     */
+    public void deletarArquivoFisico(String caminhoStorage) throws IOException {
+        if (caminhoStorage == null || caminhoStorage.trim().isEmpty()) {
+            throw new IllegalArgumentException("Caminho do arquivo não pode ser nulo.");
+        }
+
+        // Constrói o caminho completo (raiz + caminho relativo)
+        Path caminhoCompleto = Paths.get(this.localRaizStorage, caminhoStorage);
+
+        if (Files.exists(caminhoCompleto)) {
+            // Tenta deletar o arquivo
+            boolean deleted = Files.deleteIfExists(caminhoCompleto);
+
+            if (!deleted) {
+                // Lança exceção se, por algum motivo (permissão, bloqueio), o arquivo existir,
+                // mas não puder ser deletado
+                throw new IOException("Arquivo encontrado, mas não pôde ser deletado: " + caminhoCompleto);
+            }
+        } else {
+            // Tratamento suave: Se o registro está no BD, mas o arquivo sumiu (problema prévio),
+            // o GC deve deletar o registro do BD mesmo assim.
+            System.out.println("Aviso: Arquivo físico não encontrado em " + caminhoCompleto
+                    + ". Deletando apenas registro do BD.");
+        }
     }
 }

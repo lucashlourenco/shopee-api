@@ -1,4 +1,4 @@
-// src/main/java/br/com/ifpe/shopee/model/bd_principal/controller/contato/ContatoDeLoja.java
+// src/main/java/br/com/ifpe/shopee/model/bd_principal/controller/contato/ContatoDeLojaController.java
 
 package br.com.ifpe.shopee.model.bd_principal.controller.contato;
 // import io.swagger.v3.oas.annotations.Operation; // Swagger - apenas para não esquecer

@@ -52,6 +52,14 @@ postgres-data/
 # ----------------------------------------------------
 # Arquivos Locais de Mídia (ATENÇÃO!!! Ajuste conforme a sua PASTA_DE_MIDIAS)
 # ----------------------------------------------------
-shopee-storage/*
+shopee-storage/
 # Adiciona um arquivo 'placeholder' para garantir que a pasta seja versionada
 !shopee-storage/.gitkeep
+
+
+# ----------------------------------------------------
+# Arquivos e scripts do desenvolvedor
+# ----------------------------------------------------
+unificar.py
+projeto_unificado_geral.txt
+projeto_unificado_outros_arquivos.txt

@@ -14,9 +14,11 @@ import br.com.ifpe.shopee.model.bd_principal.entity.Usuario;
 import br.com.ifpe.shopee.model.bd_principal.entity.endereco.EnderecoDeEntrega;
 import br.com.ifpe.shopee.model.bd_principal.repository.TipoDeUsuarioRepository;
 import br.com.ifpe.shopee.model.bd_principal.request.CadastroClienteRequest;
+import br.com.ifpe.shopee.model.bd_principal.request.TipoDeUsuarioRequest;
 import br.com.ifpe.shopee.model.bd_principal.service.endereco.EnderecoDeEntregaService;
 import br.com.ifpe.shopee.util.exception.AdvertenciaException;
 import br.com.ifpe.shopee.util.exception.RecursoNaoEncontradoException;
+import br.com.ifpe.shopee.util.seguranca.ValidadorDeAcesso;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -32,17 +34,17 @@ public class ClienteService {
     private EnderecoDeEntregaService enderecoDeEntregaService;
     
     @Autowired
-    private TipoDeUsuarioRepository tipoDeUsuarioRepository; 
-    
-    /**
-     * Busca um Cliente pelo ID.
-     * @param id O ID do Cliente.
-     * @return O Cliente encontrado.
-     */
-    public Cliente obterPorID(UUID id) {
-        // Usa o JpaRepository de TipoDeUsuario para buscar o Cliente específico
-        return (Cliente) tipoDeUsuarioRepository.findById(id)
-                         .orElseThrow(() -> new RecursoNaoEncontradoException("Cliente com ID: '" + id + "' não encontrado."));
+    private TipoDeUsuarioRepository tipoDeUsuarioRepository;
+
+    @Autowired
+    private ValidadorDeAcesso validador;
+
+    // Método auxiliar para extrair o primeiro nome de um nome completo
+    private String extrairPrimeiroNome(String nomeCompleto) {
+        // Dada a regra de não poder ser vazio ou nulo, lá na frente o erro correto vai ser levantado
+        if (nomeCompleto == null) return ""; 
+        
+        return nomeCompleto.trim().split("\\s+")[0]; // Pega a primeira palavra
     }
 
     /**
@@ -77,7 +79,7 @@ public class ClienteService {
         Usuario usuario = usuarioService.adicionarUsuario(
             pessoa, 
             request.getConta().getSenha(), 
-            request.getConta().getLogin()
+            request.getConta().getLogin().build()
         );
     
         // Criar o Papel (Cliente)
@@ -85,27 +87,64 @@ public class ClienteService {
         cliente.setHabilitado(Boolean.TRUE);
         cliente.setDataDeCadastro(LocalDateTime.now());
         cliente.setUsuario(usuario);
+        cliente.setNome(extrairPrimeiroNome(pessoa.getNomeCompleto()));
     
         Cliente clienteSalvo = (Cliente) tipoDeUsuarioRepository.save(cliente);
         
         // Adicionar Endereço de Entrega Inicial (de forma opcional)
         if (request.getEnderecoDeEntregaInicial() != null) {
             EnderecoDeEntrega novoEndereco = request.getEnderecoDeEntregaInicial().build();
-            enderecoDeEntregaService.adicionarEnderecoDeEntrega(clienteSalvo.getId(), novoEndereco);
+            enderecoDeEntregaService.adicionarEnderecoDeEntrega(clienteSalvo.getId(), novoEndereco, usuario);
         }
         
         return clienteSalvo;
     }
     
     /**
-     * Apaga um Cliente (exclusão lógica) e orquestra a exclusão do Usuario e Pessoa
-     * se não houverem mais papéis/usuários ativos.
+     * Busca um Cliente pelo ID.
      * @param id O ID do Cliente.
+     * @return O Cliente encontrado.
+     */
+    public Cliente obterPorID(UUID id) {
+        // Usa o JpaRepository de TipoDeUsuario para buscar o Cliente específico
+        return (Cliente) tipoDeUsuarioRepository.findById(id)
+                         .orElseThrow(() -> new RecursoNaoEncontradoException("Cliente com ID: '" + id + "' não encontrado."));
+    }
+
+    /**
+     * Atualiza um Cliente apartir do ID. Como o único dado atualizável de um Cliente é o nome,
+     * este serviço apenas atualiza o nome.
+     * 
+     * @param id O ID do Cliente.
+     * @param nome O novo nome do Cliente.
+     * @param usuarioLogado O usuário que está logado.
+     * @return O Cliente atualizado.
+     */
+    public Cliente atualizarCliente(UUID idCliente, TipoDeUsuarioRequest request, Usuario usuarioLogado) {
+        Cliente cliente = obterPorID(idCliente);
+
+        // Valida se o Cliente pertence ao Usuário Logado
+        validador.validarPosse(cliente.getUsuario().getId(), usuarioLogado);
+        cliente.setNome(request.getNome());
+
+        return (Cliente) tipoDeUsuarioRepository.save(cliente);
+    }
+
+    /**
+     * Apaga um Cliente (exclusão lógica) e orquestra a exclusão do Usuario e Pessoa
+     * se não houverem mais papéis ativos.
+     * 
+     * @param id O ID do Cliente.
+     * @param usuarioLogado O usuário que está logado.
      * @return O Cliente desabilitado.
      */
     @Transactional
-    public Cliente apagarCliente(UUID id) {
+    public Cliente apagarCliente(UUID id, Usuario usuarioLogado) {
         Cliente cliente = obterPorID(id);
+
+        // Validação de Posse
+        validador.validarPosse(cliente.getUsuario().getId(), usuarioLogado);
+
         Usuario usuario = cliente.getUsuario();
         Pessoa pessoa = usuario.getPessoa();
         
@@ -113,24 +152,27 @@ public class ClienteService {
         cliente.setHabilitado(Boolean.FALSE);
         Cliente clienteDesabilitado = (Cliente) tipoDeUsuarioRepository.save(cliente);
 
-        // 2. Orquestração da Exclusão do Usuário
+        // 2. Orquestração da Exclusão do Usuário.
         // Contamos quantos papéis ativos restam para este Usuário APÓS a exclusão deste Cliente.
         long papeisAtivos = tipoDeUsuarioRepository.countTiposAtivosByUsuarioId(usuario.getId());
 
-        // Se nenhum outro papel estiver ativo, apagamos o Usuário.
+        // 3. Se nenhum outro papel estiver ativo, apagamos o Usuário e a Pessoa
         if (papeisAtivos == 0) {
-            usuarioService.apagarUsuario(usuario.getId()); 
-            
-            // 3. Orquestração da Exclusão da Pessoa
-            // Contamos quantos Usuários ativos restam para esta Pessoa APÓS a exclusão deste Usuário.
-            long usuariosAtivos = pessoaService.countUsuariosAtivosByPessoaId(pessoa.getId()); 
-
-            // Se nenhum outro Usuário estiver ativo, apagamos a Pessoa.
-            if (usuariosAtivos == 0) {
-                pessoaService.apagarPessoa(pessoa.getId());
-            }
+            usuarioService.apagarUsuario(usuario.getId(), usuarioLogado);
+            pessoaService.apagarPessoa(pessoa.getId(), usuarioLogado);
         }
         
         return clienteDesabilitado;
+    }
+
+    /**
+     * ATENÇÃO: Use com cautela. Apaga um Cliente permanentemente.
+     * 
+     * @param id O ID do endereço.
+     */
+    @Transactional
+    public void deletarPermanentemente(UUID id) {
+        Cliente cliente = obterPorID(id);
+        tipoDeUsuarioRepository.delete(cliente);
     }
 }

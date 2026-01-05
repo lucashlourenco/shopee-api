@@ -7,6 +7,8 @@ import java.util.Objects;
 
 import org.hibernate.annotations.SQLRestriction;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import br.com.ifpe.shopee.model.abstrato.contato.ContatoBasico;
 import br.com.ifpe.shopee.model.bd_principal.entity.InformacaoDeRetirada;
 import br.com.ifpe.shopee.model.bd_principal.entity.Loja;
@@ -21,6 +23,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Table(name = "contato_de_loja")
@@ -34,6 +37,8 @@ public class ContatoDeLoja extends ContatoBasico {
 
     @ManyToOne
     @JoinColumn(name = "id_loja")
+    @JsonIgnore
+    @ToString.Exclude
     private Loja loja;
 
     @ManyToMany(mappedBy = "contatos")
@@ -46,7 +51,11 @@ public class ContatoDeLoja extends ContatoBasico {
             return getId().hashCode();
         }
         
-        return Objects.hash(getLoja().getId(), getValor(), getTipo());
+        return Objects.hash(
+            (getLoja() != null ? getLoja().getId() : null),
+            getValor(),
+            getTipo()
+        );
     }
 
     @Override

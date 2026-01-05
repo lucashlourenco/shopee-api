@@ -7,6 +7,8 @@ import java.util.Objects;
 
 import org.hibernate.annotations.SQLRestriction;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import br.com.ifpe.shopee.model.abstrato.Endereco;
 import br.com.ifpe.shopee.model.bd_principal.entity.Loja;
 
@@ -18,6 +20,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Table(name = "endereco_comercial")
@@ -27,9 +30,11 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString(exclude = {"lojas"})
 public class EnderecoComercial extends Endereco {
 
     @OneToMany(mappedBy = "endereco")
+    @JsonIgnore
     private List<Loja> lojas;
 
     @Override

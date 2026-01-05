@@ -6,6 +6,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import br.com.ifpe.shopee.model.bd_principal.entity.endereco.EnderecoComercial;
 
@@ -24,4 +26,10 @@ public interface EnderecoComercialRepository extends JpaRepository<EnderecoComer
         String numero, 
         String complemento
     );
+
+    /**
+     * Conta quantas lojas estão vinculadas a este endereço via SQL.
+     */
+    @Query("SELECT COUNT(l) FROM Loja l WHERE l.endereco.id = :idEndereco AND l.habilitado = true")
+    long contarLojasVinculadas(@Param("idEndereco") UUID idEndereco);
 }

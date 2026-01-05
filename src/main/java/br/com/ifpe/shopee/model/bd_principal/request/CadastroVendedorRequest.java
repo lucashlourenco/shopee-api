@@ -26,6 +26,7 @@ public class CadastroVendedorRequest {
     // 3. Dados Específicos do Vendedor
     private String cnpj;
 
+    // 4. Dados da Loja
     @Valid
     private LojaRequest loja;
 }

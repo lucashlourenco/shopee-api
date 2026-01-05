@@ -29,5 +29,3 @@ public class ContatoDeLoginRequest extends ContatoRequest {
         return contato;
     }
 }
-
-

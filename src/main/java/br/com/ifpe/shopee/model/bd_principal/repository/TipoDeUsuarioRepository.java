@@ -15,6 +15,7 @@ public interface TipoDeUsuarioRepository extends JpaRepository<TipoDeUsuario, UU
     
     /**
      * Verifica se uma Pessoa já possui um papel de Cliente.
+     * 
      * @param idPessoa ID da Pessoa.
      * @return True se um Cliente associado à Pessoa existir.
      */
@@ -23,6 +24,7 @@ public interface TipoDeUsuarioRepository extends JpaRepository<TipoDeUsuario, UU
 
     /**
      * Verifica se uma Pessoa já possui um papel de Vendedor.
+     * 
      * @param idPessoa ID da Pessoa.
      * @return True se um Vendedor associado à Pessoa existir.
      */
@@ -31,6 +33,7 @@ public interface TipoDeUsuarioRepository extends JpaRepository<TipoDeUsuario, UU
 
     /**
      * Contagem de Tipos de Usuários ativos vinculados a um Usuário.
+     * 
      * @param usuarioId ID do Usuário.
      * @return Quantidade de Tipos de Usuários ativos.
      */

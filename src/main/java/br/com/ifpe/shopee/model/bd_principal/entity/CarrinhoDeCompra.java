@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.hibernate.annotations.SQLRestriction;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import br.com.ifpe.shopee.model.bd_principal.entity.endereco.EnderecoDeEntrega;
 import br.com.ifpe.shopee.util.entity.bd_relacional.EntidadeNegocioJPA;
 import jakarta.persistence.Entity;
@@ -19,6 +21,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Table(name = "carrinho_de_compra")
@@ -31,8 +34,10 @@ import lombok.Setter;
 public class CarrinhoDeCompra extends EntidadeNegocioJPA {
 	@OneToOne
 	@JoinColumn(name = "id_cliente", unique = true)
+	@JsonIgnore
+	@ToString.Exclude
 	private Cliente cliente;
-
+	
 	@ManyToOne
 	@JoinColumn(name = "id_endereco")
 	private EnderecoDeEntrega enderecoDeEntrega;

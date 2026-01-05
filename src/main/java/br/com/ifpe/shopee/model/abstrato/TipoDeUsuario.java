@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import br.com.ifpe.shopee.model.bd_principal.entity.Usuario;
 import br.com.ifpe.shopee.model.bd_principal.entity.contato.ContatoDeUsuario;
@@ -24,6 +25,7 @@ import jakarta.persistence.Table;
 //import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
@@ -43,6 +45,8 @@ public abstract class TipoDeUsuario extends EntidadeNegocioJPA {
 	@ManyToOne
 	// @JoinColumn(name = "id_usuario", nullable = false)						|> Ruinm para a compra
 	// @NotNull(message = "Este tipo precisa estar associado a um usuário.")	|
+    @JsonIgnore
+    @ToString.Exclude
 	@JoinColumn(name = "id_usuario")
 	private Usuario usuario;
 

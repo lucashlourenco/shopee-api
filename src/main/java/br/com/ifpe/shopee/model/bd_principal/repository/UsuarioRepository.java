@@ -15,6 +15,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
     
     /**
      * Busca um Usuario pelo ID da Pessoa associada.
+     * 
      * @param pessoaId O ID da Pessoa.
      * @return Usuario ou Optional.empty.
      */
@@ -26,6 +27,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
      * mas a query usa o ContatoDeLogin (credenciais) no join. Se houver alterações
      * em ContatoDeLogin, essa consulta pode precisar ser atualizada, já que é
      * considerado um valor diretamente.
+     * 
      * @param valor O valor (email ou telefone) do ContatoDeLogin.
      * @return Usuario ou Optional.empty.
      */

@@ -9,11 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.ifpe.shopee.model.bd_principal.entity.Loja;
+import br.com.ifpe.shopee.model.bd_principal.entity.Usuario;
 import br.com.ifpe.shopee.model.bd_principal.entity.contato.ContatoDeLoja;
 import br.com.ifpe.shopee.model.bd_principal.repository.contato.ContatoDeLojaRepository;
 import br.com.ifpe.shopee.model.bd_principal.service.LojaService;
+import br.com.ifpe.shopee.util.exception.AdvertenciaException;
 import br.com.ifpe.shopee.util.exception.EntidadeDuplicadaException;
 import br.com.ifpe.shopee.util.exception.RecursoNaoEncontradoException;
+import br.com.ifpe.shopee.util.seguranca.ValidadorDeAcesso;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -25,31 +28,25 @@ public class ContatoDeLojaService {
     @Autowired
     private LojaService lojaService; // Usado para buscar a Loja principal
 
-    /**
-     * Serviço para obter um contato de Loja pelo ID.
-     * 
-     * @param id O ID do contato.
-     * @return O ContatoDeLoja encontrado.
-     */
-    public ContatoDeLoja obterPorID(UUID id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Contato de loja não encontrado com ID: " + id));
-    }
+    @Autowired
+    private ValidadorDeAcesso validador;
 
     /**
      * Serviço para adicionar um novo contato a uma Loja existente.
      * Implementa a regra de unicidade de domínio: (Loja + Valor + Tipo) deve ser
      * único.
      *
-     * @param idLoja      O ID da Loja onde o contato será adicionado.
+     * @param idLoja O ID da Loja onde o contato será adicionado.
      * @param novoContato A Entidade ContatoDeLoja (convertida a partir do Request).
      * @return O ContatoDeLoja salvo.
      */
     @Transactional
-    public ContatoDeLoja adicionarContatoDeLoja(UUID idLoja, ContatoDeLoja novoContato) {
+    public ContatoDeLoja adicionarContatoDeLoja(UUID idLoja, ContatoDeLoja novoContato, Usuario usuarioLogado) {
         // Verificar e obter a Loja
-        // TODO: LojaService.obterPorID lança RecursoNaoEncontradoException
         Loja loja = lojaService.obterPorID(idLoja);
+
+        // Verifica se o contato pertence ao usuario logado
+        validador.validarPosse(loja.getVendedor().getUsuario().getId(), usuarioLogado);
 
         // Verificar unicidade (Regra: Loja + Valor + Tipo deve ser único)
         ContatoDeLoja contatoExistente = repository.findByLojaIdAndValorAndTipo(
@@ -73,6 +70,27 @@ public class ContatoDeLojaService {
     }
 
     /**
+     * Serviço para obter um contato de Loja pelo ID.
+     * 
+     * @param id O ID do contato.
+     * @return O ContatoDeLoja encontrado.
+     */
+    public ContatoDeLoja obterPorID(UUID id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Contato de loja com ID: " + id + " não encontrado."));
+    }
+
+    /**
+     * Listar todos os contatos de uma Loja.
+     * 
+     * @param idLoja O ID da Loja onde os contatos serão buscados.
+     * @return A lista de contatos.
+     */
+    public List<ContatoDeLoja> listarContatosDeLoja(UUID idLoja) {
+        return repository.findByLojaId(idLoja);
+    }
+
+    /**
      * Altera um contato de Loja existente.
      * 
      * @param id              O ID do contato a ser alterado.
@@ -81,24 +99,29 @@ public class ContatoDeLojaService {
      * @return O ContatoDeLoja alterado.
      */
     @Transactional
-    public ContatoDeLoja alterarContato(UUID id, ContatoDeLoja contatoAlterado) {
-
+    public ContatoDeLoja alterarContatoDeLoja(UUID id, ContatoDeLoja contatoAlterado) {
         ContatoDeLoja contatoOriginal = obterPorID(id);
 
-        // Verificar se o novo Valor/Tipo já existe na mesmo Loja,
-        // mas apenas se o valor ou tipo foram alterados.
+        // Verificando se o contato foi realmente alterado
+        // Preparando o contatoAlterado para a comparação de igualdade
+        contatoAlterado.setLoja(contatoOriginal.getLoja());
+        contatoAlterado.setId(null);
 
-        boolean valorOuTipoMudou = !contatoOriginal.getValor().equals(contatoAlterado.getValor())
-                || !contatoOriginal.getTipo().equals(contatoAlterado.getTipo());
+        if (contatoOriginal.equals(contatoAlterado)) {
+            throw new AdvertenciaException("Nenhuma alteração foi realizada no contato.");
+        }
 
-        if (valorOuTipoMudou) {
+        // Verificar duplicidade apenas se Valor ou Tipo mudaram
+        if (!contatoOriginal.getValor().equals(contatoAlterado.getValor()) || 
+            !contatoOriginal.getTipo().equals(contatoAlterado.getTipo())) {
+
             ContatoDeLoja contatoDuplicado = repository.findByLojaIdAndValorAndTipo(
-                    contatoOriginal.getLoja().getId(),
-                    contatoAlterado.getValor(),
-                    contatoAlterado.getTipo());
+                contatoOriginal.getLoja().getId(), 
+                contatoAlterado.getValor(), 
+                contatoAlterado.getTipo()
+            );
 
-            // Se for encontrado um contato duplicado, e esse contato não for o original que
-            // estamos alterando...
+            // Se for encontrado um contato duplicado, e esse contato não for o original que estamos alterando...
             if (contatoDuplicado != null && !contatoDuplicado.getId().equals(contatoOriginal.getId())) {
                 throw new EntidadeDuplicadaException("O novo valor/tipo de contato já existe para esta loja.");
             }
@@ -113,25 +136,20 @@ public class ContatoDeLojaService {
     }
 
     /**
-     * Listar todos os contatos de uma Loja.
-     * 
-     * @param idLoja O ID da Loja onde os contatos serão buscados.
-     * @return A lista de contatos.
-     */
-    public List<ContatoDeLoja> listarContatos(UUID idLoja) {
-        return repository.findByLojaId(idLoja);
-    }
-
-    /**
      * Apaga um contato de Loja (exclusão lógica).
      * 
      * @param id O ID do contato.
      * @return O ContatoDeLoja apagado.
      */
     @Transactional
-    public ContatoDeLoja apagarContato(UUID id) {
+    public ContatoDeLoja apagarContatoDeLoja(UUID id, Usuario usuarioLogado) {
+        // TODO: Verificar se este contato está vinculado a uma InformacaoDeRetirada antes de apaga-lo
         ContatoDeLoja contato = obterPorID(id);
+
+        // Valida se o contato pertence ao usuário logado
+        validador.validarPosse(contato.getLoja().getVendedor().getUsuario().getId(), usuarioLogado);
         contato.setHabilitado(Boolean.FALSE);
+
         return repository.save(contato);
     }
 
